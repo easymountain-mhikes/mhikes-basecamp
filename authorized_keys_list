@@ -1,5 +1,14 @@
 # Rappel : les entrées (commentaire + clé) doivent être triées par ordre
 # alphabétique du prénom du propriétaire — cet ordre est vérifié par le CI.
 
+# David
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRQllOzWnxwSUEJ/Vpk1DPTtkYi4MKVOTUl9T3HcZt3 david-mhikes-basecamp
+
 # Francois
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIELWwEmReI3qK5wf5zgYICCzGPscquUoDUlDPvsm2sGR francois-mhikes-basecamp
+
+# Ronald
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0HSWUXTkx335AtOS4hn2Aa3RfgCsr6o4Zo2pQ8/udr ronald-mhikes-basecamp
+
+# Vincent
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPQ36zRfOTE91Ihs9XCbzKYVIHdcDbo+4QF6QWqw9ZN9 vincent-mhikes-basecamp
