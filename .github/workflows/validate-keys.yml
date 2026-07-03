@@ -1,0 +1,60 @@
+name: Validate authorized_keys_list
+on:
+  pull_request:
+    paths:
+      - authorized_keys_list
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject private key material
+        run: |
+          set -euo pipefail
+          if grep -qi "PRIVATE KEY" authorized_keys_list; then
+            echo "::error::Private key material detected in file!"
+            exit 1
+          fi
+      - name: Check public key format
+        run: |
+          set -euo pipefail
+          while IFS= read -r line; do
+            [[ -z "$line" || "$line" =~ ^# ]] && continue
+            echo "$line" | ssh-keygen -lf /dev/stdin > /dev/null || {
+              echo "::error::Invalid public key line: $line"
+              exit 1
+            }
+          done < authorized_keys_list
+      - name: Check for duplicate keys
+        run: |
+          set -euo pipefail
+          duplicates=$(awk '/^ssh-/ {print $2}' authorized_keys_list | sort | uniq -d)
+          if [[ -n "$duplicates" ]]; then
+            echo "::error::Duplicate public key material detected:"
+            echo "$duplicates"
+            exit 1
+          fi
+      - name: Check alphabetical order
+        run: |
+          set -euo pipefail
+          names=$(awk '/^#/ {name=substr($0,3)} /^ssh-/ {print name}' authorized_keys_list)
+          sorted=$(echo "$names" | LC_ALL=C sort -f)
+          if [[ "$names" != "$sorted" ]]; then
+            echo "::error::Entries in authorized_keys_list are not sorted alphabetically by first name."
+            exit 1
+          fi
+      - name: Check comment consistency
+        run: |
+          set -euo pipefail
+          awk '
+            /^#/ { name = tolower(substr($0, 3)); next }
+            /^ssh-/ {
+              expected = name "-mhikes-basecamp"
+              if ($3 != expected) {
+                print "::error::Comment mismatch: expected \"" expected "\" but found \"" $3 "\""
+                status = 1
+              }
+            }
+            END { exit status }
+          ' authorized_keys_list
